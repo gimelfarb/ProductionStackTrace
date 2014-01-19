@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTrace", "ProductionStackTrace\ProductionStackTrace.csproj", "{6F8A759B-6096-468E-A370-09C9785D673C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTrace.Analyze", "ProductionStackTrace.Analyze\ProductionStackTrace.Analyze.csproj", "{C37C6C36-F464-4C16-AC1E-22BE50CCF290}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTrace.Test", "ProductionStackTrace.Test\ProductionStackTrace.Test.csproj", "{AE79C47C-7DE4-4C02-BCF0-E64197013FA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTrace.Analyze.Console", "ProductionStackTrace.Analyze.Console\ProductionStackTrace.Analyze.Console.csproj", "{6E444AEC-B1EB-43C7-AE4A-A57F7A86C68E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTrace.Test.Library", "ProductionStackTrace.Test.Library\ProductionStackTrace.Test.Library.csproj", "{AD70438D-18CF-46F5-84DD-4D79B9FB2876}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{130D2213-F277-48EB-85AE-9C0CC88E629C}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F8A759B-6096-468E-A370-09C9785D673C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F8A759B-6096-468E-A370-09C9785D673C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F8A759B-6096-468E-A370-09C9785D673C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F8A759B-6096-468E-A370-09C9785D673C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C37C6C36-F464-4C16-AC1E-22BE50CCF290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C37C6C36-F464-4C16-AC1E-22BE50CCF290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C37C6C36-F464-4C16-AC1E-22BE50CCF290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C37C6C36-F464-4C16-AC1E-22BE50CCF290}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE79C47C-7DE4-4C02-BCF0-E64197013FA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE79C47C-7DE4-4C02-BCF0-E64197013FA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE79C47C-7DE4-4C02-BCF0-E64197013FA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE79C47C-7DE4-4C02-BCF0-E64197013FA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E444AEC-B1EB-43C7-AE4A-A57F7A86C68E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E444AEC-B1EB-43C7-AE4A-A57F7A86C68E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E444AEC-B1EB-43C7-AE4A-A57F7A86C68E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E444AEC-B1EB-43C7-AE4A-A57F7A86C68E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD70438D-18CF-46F5-84DD-4D79B9FB2876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD70438D-18CF-46F5-84DD-4D79B9FB2876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD70438D-18CF-46F5-84DD-4D79B9FB2876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD70438D-18CF-46F5-84DD-4D79B9FB2876}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

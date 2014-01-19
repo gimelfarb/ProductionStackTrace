@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AE79C47C-7DE4-4C02-BCF0-E64197013FA4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ProductionStackTrace.Test</RootNamespace>
+    <AssemblyName>ProductionStackTrace.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IsolatedEnvironment.cs" />
+    <Compile Include="IsolatedMethodResult.cs" />
+    <Compile Include="TestExceptionReporting.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ProductionStackTrace.Analyze\ProductionStackTrace.Analyze.csproj">
+      <Project>{c37c6c36-f464-4c16-ac1e-22be50ccf290}</Project>
+      <Name>ProductionStackTrace.Analyze</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProductionStackTrace\ProductionStackTrace.csproj">
+      <Project>{6f8a759b-6096-468e-a370-09c9785d673c}</Project>
+      <Name>ProductionStackTrace</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <Target Name="AfterBuild">
+    <!-- Build test helper library -->
+    <MSBuild Projects="..\ProductionStackTrace.Test.Library\ProductionStackTrace.Test.Library.csproj" Properties="Configuration=$(Configuration);Platform=$(Platform)" Targets="Build">
+      <Output TaskParameter="TargetOutputs" ItemName="TestLibraryAssembly" />
+    </MSBuild>
+    <!-- Copy DLL to /lib subfolder, DLL+PDB to /libpdb subfolder -->
+    <!-- They will be loaded each in a different AppDomain to test symbol loading -->
+    <Copy SourceFiles="@(TestLibraryAssembly)" DestinationFolder="$(TargetDir)lib" />
+    <Copy SourceFiles="@(TestLibraryAssembly)" DestinationFolder="$(TargetDir)libpdb" />
+    <Copy SourceFiles="@(TestLibraryAssembly->'%(RootDir)%(Directory)%(Filename).pdb')" DestinationFolder="$(TargetDir)libpdb" />
+    <!-- Make sure to delete original PDB location, since DLL will refer
+             to it with a fully qualified path, even though it is in the folder
+             without the PDB file -->
+    <MSBuild Projects="..\ProductionStackTrace.Test.Library\ProductionStackTrace.Test.Library.csproj" Properties="Configuration=$(Configuration);Platform=$(Platform)" Targets="Clean">
+    </MSBuild>
+  </Target>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+</Project>
