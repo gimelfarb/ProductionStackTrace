@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonAssemblyInfo.cs" />
     <Compile Include="ConsoleEx.cs" />
     <Compile Include="ConsoleTextReader.cs" />
     <Compile Include="Program.cs" />

@@ -6,12 +6,8 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ProductionStackTrace.Analyze.Console")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Command-line tool to analyze stack traces produced by ProductionStackTrace module")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ProductionStackTrace.Analyze.Console")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
-[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

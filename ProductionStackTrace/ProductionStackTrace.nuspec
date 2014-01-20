@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+    <metadata>
+        <id>$id$</id>
+        <version>$version$</version>
+        <title>$title$</title>
+        <authors>$author$</authors>
+        <owners>$author$</owners>
+        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <projectUrl>https://github.com/gimelfarb/ProductionStackTrace</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>$description$</description>
+        <copyright>Copyright 2014 by Lev Gimelfarb</copyright>
+        <tags>logging unhandled exception stacktrace productionstacktrace production</tags>
+    </metadata>
+    <files>
+        <file src="bin\$configuration$\v2.0\$targetfilename$" target="lib\net20\" />
+        <file src="bin\$configuration$\v4.0\$targetfilename$" target="lib\net40\" />
+        <!--file src="bin\$configuration$\v4.5\$targetfilename$" target="lib\net45\" /-->
+    </files>
+</package>

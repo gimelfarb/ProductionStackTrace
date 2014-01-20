@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using ProductionStackTrace.Internals;
 
 namespace ProductionStackTrace
@@ -33,7 +31,9 @@ namespace ProductionStackTrace
                 builder.AppendLine();
                 builder.AppendLine("==========");
 
-                var keys = new SortedSet<string>(ctx.AssemblyInfo.Keys, StringComparer.OrdinalIgnoreCase);
+                var keys = new List<string>(ctx.AssemblyInfo.Keys);
+                keys.Sort(StringComparer.OrdinalIgnoreCase);
+
                 foreach (var key in keys)
                 {
                     var info = ctx.AssemblyInfo[key];

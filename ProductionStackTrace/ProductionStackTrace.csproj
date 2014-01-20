@@ -16,7 +16,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Debug\$(TargetFrameworkVersion)\</OutputPath>
+    <PackageOutputDir>bin\Debug</PackageOutputDir>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,26 +25,25 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Release\$(TargetFrameworkVersion)\</OutputPath>
+    <PackageOutputDir>bin\Debug</PackageOutputDir>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="CommonAssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExceptionEx.cs" />
     <Compile Include="Internals\AssemblyDebugInfo.cs" />
     <Compile Include="ExceptionReporting.cs" />
     <Compile Include="Internals\PeHeaders.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" Condition="'$(TargetFrameworkVersion)' != 'v2.0'" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ProductionStackTrace.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -53,4 +53,17 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <PropertyGroup>
+    <!-- Set compile time constants to detect target framework version -->
+    <CustomConstants Condition=" '$(TargetFrameworkVersion)' == 'v2.0' ">V2</CustomConstants>
+    <CustomConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">V4</CustomConstants>
+    <DefineConstants Condition=" '$(DefineConstants)' != '' And '$(CustomConstants)' != '' ">$(DefineConstants);</DefineConstants>
+    <DefineConstants>$(DefineConstants)$(CustomConstants)</DefineConstants>
+  </PropertyGroup>
+  <Target Name="AfterBuild" Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;Configuration=$(Configuration);Platform=$(Platform)" />
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v2.0;Configuration=$(Configuration);Platform=$(Platform)" />
+    <CallTarget Targets="BuildPackage" />
+  </Target>
 </Project>

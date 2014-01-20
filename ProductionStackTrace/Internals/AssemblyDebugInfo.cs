@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductionStackTrace.Internals
 {
@@ -81,7 +78,8 @@ namespace ProductionStackTrace.Internals
             // PDB filepath
 
             var rsdsInfo = (RSDS_DEBUG_FORMAT)Marshal.PtrToStructure(rsdsPtr, typeof(RSDS_DEBUG_FORMAT));
-            var path = Marshal.PtrToStringAnsi(rsdsPtr + Marshal.SizeOf(typeof(RSDS_DEBUG_FORMAT)));
+            var pathPtr = new IntPtr(rsdsPtr.ToInt64() + Marshal.SizeOf(typeof(RSDS_DEBUG_FORMAT)));
+            var path = Marshal.PtrToStringAnsi(pathPtr);
 
             return new AssemblyDebugInfo()
             {

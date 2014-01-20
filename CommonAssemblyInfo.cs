@@ -8,6 +8,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ProductionStackTrace")]
 [assembly: AssemblyDescription("Full information stack trace without deploying PDBs")]
 [assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Lev Gimelfarb")]
+[assembly: AssemblyProduct("ProductionStackTrace")]
+[assembly: AssemblyCopyright("Copyright © 2014 by Lev Gimelfarb")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
