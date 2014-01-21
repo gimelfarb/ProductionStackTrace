@@ -15,8 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTrace.Test.L
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{130D2213-F277-48EB-85AE-9C0CC88E629C}"
 	ProjectSection(SolutionItems) = preProject
+		.nuget\BuildCommon.targets = .nuget\BuildCommon.targets
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.targets = .nuget\NuGet.targets
+		.nuget\semver.txt = .nuget\semver.txt
 	EndProjectSection
 EndProject
 Global

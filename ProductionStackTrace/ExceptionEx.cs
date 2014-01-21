@@ -22,10 +22,14 @@ namespace ProductionStackTrace
     }
 }
 
-#if V2
+#if TARGET_NET_20
 
 namespace System.Runtime.CompilerServices
 {
+    /// <summary>
+    /// Extenstion attribute definition for .NET 2.0 target framework to
+    /// support extension method definitions.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class ExtensionAttribute : Attribute {}
 }

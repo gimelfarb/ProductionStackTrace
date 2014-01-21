@@ -11,13 +11,14 @@
     <AssemblyName>ProductionStackTrace</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
+    <PackageOutputDir>bin\$(Configuration)</PackageOutputDir>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\$(TargetFrameworkVersion)\</OutputPath>
-    <PackageOutputDir>bin\Debug</PackageOutputDir>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,14 +26,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\$(TargetFrameworkVersion)\</OutputPath>
-    <PackageOutputDir>bin\Debug</PackageOutputDir>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CommonAssemblyInfo.cs" />
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ExceptionEx.cs" />
     <Compile Include="Internals\AssemblyDebugInfo.cs" />
@@ -54,13 +55,7 @@
   </Target>
   -->
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <PropertyGroup>
-    <!-- Set compile time constants to detect target framework version -->
-    <CustomConstants Condition=" '$(TargetFrameworkVersion)' == 'v2.0' ">V2</CustomConstants>
-    <CustomConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">V4</CustomConstants>
-    <DefineConstants Condition=" '$(DefineConstants)' != '' And '$(CustomConstants)' != '' ">$(DefineConstants);</DefineConstants>
-    <DefineConstants>$(DefineConstants)$(CustomConstants)</DefineConstants>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\BuildCommon.targets" />
   <Target Name="AfterBuild" Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;Configuration=$(Configuration);Platform=$(Platform)" />
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v2.0;Configuration=$(Configuration);Platform=$(Platform)" />

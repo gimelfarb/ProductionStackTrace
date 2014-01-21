@@ -1,21 +1,22 @@
 <?xml version="1.0"?>
 <package >
     <metadata>
-        <id>$id$</id>
+        <id>ProductionStackTrace</id>
         <version>$version$</version>
-        <title>$title$</title>
-        <authors>$author$</authors>
-        <owners>$author$</owners>
+        <title>ProductionStackTrace</title>
+        <authors>Lev Gimelfarb</authors>
+        <owners>Lev Gimelfarb</owners>
         <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
         <projectUrl>https://github.com/gimelfarb/ProductionStackTrace</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>$description$</description>
+        <description>Full information stack trace without deploying PDBs</description>
         <copyright>Copyright 2014 by Lev Gimelfarb</copyright>
         <tags>logging unhandled exception stacktrace productionstacktrace production</tags>
     </metadata>
     <files>
-        <file src="bin\$configuration$\v2.0\$targetfilename$" target="lib\net20\" />
-        <file src="bin\$configuration$\v4.0\$targetfilename$" target="lib\net40\" />
-        <!--file src="bin\$configuration$\v4.5\$targetfilename$" target="lib\net45\" /-->
+        <file src="bin\$configuration$\v2.0\*" exclude="**\*.tmp" target="lib\net20\" />
+        <file src="bin\$configuration$\v4.0\*" exclude="**\*.tmp" target="lib\net40\" />
+        <file src="bin\$configuration$\v4.5\*" exclude="**\*.tmp" target="lib\net45\" />
+        <file src="**\*.cs" exclude="obj\**" target="src" />
     </files>
 </package>
