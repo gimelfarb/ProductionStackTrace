@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
     <PackageOutputDir>bin\$(Configuration)</PackageOutputDir>
+      <NuGetCommandExtra>-NoPackageAnalysis</NuGetCommandExtra>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>

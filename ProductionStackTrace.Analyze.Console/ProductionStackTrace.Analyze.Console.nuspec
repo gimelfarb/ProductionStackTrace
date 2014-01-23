@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package>
     <metadata>
         <id>ProductionStackTrace.Analyze.Console</id>
         <version>$version$</version>
@@ -14,9 +14,6 @@
         <tags>logging unhandled exception stacktrace productionstacktrace production</tags>
     </metadata>
     <files>
-        <file src="..\ProductionStackTrace.Analyze\bin\$configuration$\v2.0\*" exclude="**\*.tmp" target="tools\net20\" />
-        <file src="..\ProductionStackTrace.Analyze\bin\$configuration$\v4.0\*" exclude="**\*.tmp" target="tools\net40\" />
-        <file src="..\ProductionStackTrace.Analyze\bin\$configuration$\v4.5\*" exclude="**\*.tmp" target="tools\net45\" />
         <file src="..\ProductionStackTrace.Analyze\**\*.cs" exclude="obj\**" target="src\ProductionStackTrace.Analyze\" />
         <file src="**\*.cs" exclude="obj\**" target="src\ProductionStackTrace.Analyze.Console\" />
         <file src="bin\$configuration$\v2.0\*" exclude="**\*.tmp" target="tools\net20\" />

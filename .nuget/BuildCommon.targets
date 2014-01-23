@@ -22,16 +22,32 @@
         <DefineConstants Condition=" '$(DefineConstants)' != '' And '$(CustomConstants)' != '' ">$(DefineConstants);</DefineConstants>
         <DefineConstants>$(DefineConstants)$(CustomConstants)</DefineConstants>
     </PropertyGroup>
-
+    
+    
+    <!--
+        Define BuildPackage if .nuspec specified
+    -->
+    <PropertyGroup>
+        <NuspecFile Condition="'$(NuspecFile)' == ''">$(ProjectDir)$(ProjectName).nuspec</NuspecFile>
+        <BuildPackage Condition="'$(BuildPackageIfMarked)' == 'true' And $([System.IO.File]::Exists($(NuspecFile)))">true</BuildPackage>
+        <BuildDependsOn Condition="!$(BuildDependsOn.Contains('BuildPackage;')) And '$(BuildPackage)' == 'true'">
+            $(BuildDependsOn);
+            BuildPackage;
+        </BuildDependsOn>
+    </PropertyGroup>
+    
 
     <!--
         Define NuGet pack command based on the NuSpec and found version.
     -->
     <Target Name="UpdateNuGetPackCommand" BeforeTargets="BuildPackage" Condition="!$(NoNuspecPackCommand)" DependsOnTargets="CommonBuildFindProjectBuildVersion">
         <PropertyGroup>
-            <NuspecFile Condition="'$(NuspecFile)' == ''">$(ProjectName).nuspec</NuspecFile>
-            <BuildCommand>$(NuGetCommand) pack "$(NuspecFile)" -Properties "Configuration=$(Configuration);Platform=$(Platform);Version=$(VersionSymVer)" $(NonInteractiveSwitch) -OutputDirectory "$(PackageOutputDir)" -symbols</BuildCommand>
+            <PackageOutputDir Condition="'$(PackageOutputBaseDir)' != ''">$(PackageOutputBaseDir)\$(ProjectName)</PackageOutputDir>
+            <BuildCommand>$(NuGetCommand) pack "$(NuspecFile)" -Properties "Configuration=$(Configuration);Platform=$(Platform);Version=$(VersionSymVer)" $(NonInteractiveSwitch) -OutputDirectory "$(PackageOutputDir)" -symbols $(NuGetCommandExtra)</BuildCommand>
         </PropertyGroup>
+    </Target>
+    <Target Name="WriteNuGetVersionToFile" AfterTargets="BuildPackage" Condition="'$(WriteNuGetVersionToFile)' == 'true'">
+        <WriteLinesToFile File="$(PackageOutputDir)\.version.txt" Lines="$(VersionSymVer)" Overwrite="true" />
     </Target>
 
 
@@ -56,8 +72,7 @@
     <Target Name="CommonBuildDefineModifiedAssemblyVersion" DependsOnTargets="CommonBuildFindProjectBuildVersion;_CommonBuildModifyAssemblyVersion">
     </Target>
     
-    <Target Name="_CommonBuildModifyAssemblyVersion" 
-            Condition="'$(VersionMajor)' != '' and '$(VersionMinor)' != '' and '$(VersionBuild)' != '' and '$(VersionRevision)' != ''">
+    <Target Name="_CommonBuildModifyAssemblyVersion" Condition="'$(VersionAssembly)' != ''">
         <!-- Find AssemblyInfo.cs or AssemblyInfo.vb in the "Compile" Items. Remove it from "Compile"
              Items because we will use a modified version instead. -->
         <ItemGroup>
@@ -74,10 +89,10 @@
         <!-- Replace the version bit (in AssemblyVersion and AssemblyFileVersion attributes) using regular
              expression. Use the defined properties: $(VersionMajor), $(VersionMinor), etc. These are
              set by CommonBuildFindProjectBuildVersion target. -->
-        <Message Text="Setting AssemblyVersion to $(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)" />
+        <Message Text="Setting AssemblyVersion to $(VersionAssembly)" />
         <RegexUpdateFile Files="@(ModifiedAssemblyInfo)"
-                    Regex="Version\(&quot;(\d+)\.(\d+)\.(\d+)\.(\d+)&quot;\)"
-                    ReplacementText="Version(&quot;$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)&quot;)"
+                    Regex="Version\(&quot;(\d+)\.(\d+)(\.(\d+)\.(\d+)|\.*)&quot;\)"
+                    ReplacementText="Version(&quot;$(VersionAssembly)&quot;)"
                     />
         <!-- Include the modified AssemblyInfo.cs/.vb file in "Compile" items (instead of the original). -->
         <ItemGroup>
@@ -92,14 +107,30 @@
             <Output ItemName="FoundVersion" TaskParameter="Result" />
         </FindVersionFile>
 
-        <Message Importance="high" Text="Found build version xml file: %(FoundVersion.File) [%(FoundVersion.Identity)]" Condition="'@(FoundVersion)' != ''" />
+        <Message Importance="high" Text="Found build version xml file: %(FoundVersion.File)" Condition="'@(FoundVersion)' != ''" />
         <PropertyGroup Condition="'@(FoundVersion)' != ''">
-            <VersionSymVer>@(FoundVersion)</VersionSymVer>
-            <VersionMajor>%(FoundVersion.Major)</VersionMajor>
-            <VersionMinor>%(FoundVersion.Minor)</VersionMinor>
-            <VersionBuild>%(FoundVersion.Build)</VersionBuild>
-            <VersionRevision>%(FoundVersion.Revision)</VersionRevision>
+            <VersionMajor Condition="'$(VersionMajor)' == ''">%(FoundVersion.Major)</VersionMajor>
+            <VersionMinor Condition="'$(VersionMinor)' == ''">%(FoundVersion.Minor)</VersionMinor>
+            <VersionBuild Condition="'$(VersionBuild)' == ''">%(FoundVersion.Build)</VersionBuild>
+            <VersionRevision Condition="'$(VersionRevision)' == ''">%(FoundVersion.Revision)</VersionRevision>
+            <VersionPreRelease Condition="'$(VersionPreRelease)' == ''">%(FoundVersion.PreRelease)</VersionPreRelease>
+            <VersionBuildMeta Condition="'$(VersionBuildMeta)' == ''">%(FoundVersion.BuildMeta)</VersionBuildMeta>
         </PropertyGroup>
+
+        <PropertyGroup>
+            <VersionMajor Condition="'$(VersionMajor)' == ''">0</VersionMajor>
+            <VersionMinor Condition="'$(VersionMinor)' == ''">0</VersionMinor>
+            <VersionBuild Condition="'$(VersionBuild)' == ''">0</VersionBuild>
+            <VersionRevision Condition="'$(VersionRevision)' == ''">0</VersionRevision>
+
+            <VersionSymVer>$(VersionMajor).$(VersionMinor).$(VersionBuild)</VersionSymVer>
+            <VersionSymVer Condition="'$(VersionPreRelease)' != ''">$(VersionSymVer)-$(VersionPreRelease)</VersionSymVer>
+            <VersionSymVerFull Condition="'$(VersionBuildMeta)' != ''">$(VersionSymVer)+$(VersionBuildMeta)</VersionSymVerFull>
+
+            <VersionAssembly>$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)</VersionAssembly>
+        </PropertyGroup>
+
+        <Message Importance="high" Text="Using build version: $(VersionSymVerFull) [$(VersionAssembly)]" Condition="'$(VersionSymVer)' != ''" />
     </Target>
 
     <UsingTask TaskName="RegexUpdateFile" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
