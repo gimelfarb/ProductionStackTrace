@@ -59,6 +59,5 @@
   <Target Name="AfterBuild" Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;Configuration=$(Configuration);Platform=$(Platform)" />
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v2.0;Configuration=$(Configuration);Platform=$(Platform)" />
-    <CallTarget Targets="BuildPackage" />
   </Target>
 </Project>

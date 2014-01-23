@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductionStackTrace.Analyze
 {
@@ -11,7 +9,13 @@ namespace ProductionStackTrace.Analyze
     /// </summary>
     public class SourceLocation
     {
+        /// <summary>
+        /// Full path to the original source file.
+        /// </summary>
         public string SourceFile { get; set; }
+        /// <summary>
+        /// Line number within the source file.
+        /// </summary>
         public long LineNumber { get; set; }
     }
 }

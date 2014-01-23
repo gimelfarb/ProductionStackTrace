@@ -11,13 +11,14 @@
     <AssemblyName>ProductionStackTrace.Analyze.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
+    <PackageOutputDir>bin\$(Configuration)</PackageOutputDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,19 +27,13 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" Condition="'$(TargetFrameworkVersion)' != 'v2.0'" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
@@ -51,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="ProductionStackTrace.Analyze.Console.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProductionStackTrace.Analyze\ProductionStackTrace.Analyze.csproj">
@@ -66,4 +62,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Import Project="$(SolutionDir)\.nuget\BuildCommon.targets" />
+  <Target Name="AfterBuild" Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;Configuration=$(Configuration);Platform=$(Platform)" />
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v2.0;Configuration=$(Configuration);Platform=$(Platform)" />
+  </Target>
 </Project>

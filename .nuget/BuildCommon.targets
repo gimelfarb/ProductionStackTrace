@@ -27,9 +27,10 @@
     <!--
         Define NuGet pack command based on the NuSpec and found version.
     -->
-    <Target Name="UpdateNuGetPackCommand" BeforeTargets="BuildPackage" Condition="!$(NoNuspecPackCommand)">
+    <Target Name="UpdateNuGetPackCommand" BeforeTargets="BuildPackage" Condition="!$(NoNuspecPackCommand)" DependsOnTargets="CommonBuildFindProjectBuildVersion">
         <PropertyGroup>
-            <BuildCommand>$(NuGetCommand) pack "$(ProjectName).nuspec" -Properties "Configuration=$(Configuration);Platform=$(Platform);Version=$(VersionSymVer)" $(NonInteractiveSwitch) -OutputDirectory "$(PackageOutputDir)" -symbols</BuildCommand>
+            <NuspecFile Condition="'$(NuspecFile)' == ''">$(ProjectName).nuspec</NuspecFile>
+            <BuildCommand>$(NuGetCommand) pack "$(NuspecFile)" -Properties "Configuration=$(Configuration);Platform=$(Platform);Version=$(VersionSymVer)" $(NonInteractiveSwitch) -OutputDirectory "$(PackageOutputDir)" -symbols</BuildCommand>
         </PropertyGroup>
     </Target>
 

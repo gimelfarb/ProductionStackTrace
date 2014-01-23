@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ProductionStackTrace.Analyze
 {
@@ -36,6 +34,9 @@ namespace ProductionStackTrace.Analyze
 
         private SymbolSearch _symSearch;
 
+        /// <summary>
+        /// Initialize a new instance of <see cref="ExceptionReportInterpreter"/>.
+        /// </summary>
         public ExceptionReportInterpreter()
         {
             _symSearch = new SymbolSearch();
@@ -64,7 +65,7 @@ namespace ProductionStackTrace.Analyze
 
         /// <summary>
         /// Convert exception stack trace report from the format produced by
-        /// <see cref="ExceptionReporting.GetExceptionReport"/> (with no source mapping)
+        /// ExceptionReporting.GetExceptionReport (ProductionStackTrace), with no source mapping,
         /// to a standard stack trace containing original source and line number mapping.
         /// </summary>
         /// <param name="r">Input stack trace report</param>
@@ -110,7 +111,7 @@ namespace ProductionStackTrace.Analyze
                                 int pdbAge;
                                 Guid pdbGuid;
                                 if (int.TryParse(pdbAgeStr, out pdbAge) &&
-                                    Guid.TryParse(pdbGuidStr, out pdbGuid))
+                                    TryParseGuid(pdbGuidStr, out pdbGuid))
                                 {
                                     info.PdbAge = pdbAge;
                                     info.PdbGuid = pdbGuid;
@@ -203,6 +204,21 @@ namespace ProductionStackTrace.Analyze
             // Before returning ensure that everything is written out
 
             w.Flush();
+        }
+
+        private static bool TryParseGuid(string str, out Guid guid)
+        {
+#if TARGET_NET_20
+            try {
+                guid = new Guid(str);
+                return true;
+            } catch (FormatException) {
+                guid = Guid.Empty;
+                return false;
+            }
+#else
+            return Guid.TryParse(str, out guid);
+#endif
         }
     }
 }

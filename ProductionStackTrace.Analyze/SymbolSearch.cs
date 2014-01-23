@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductionStackTrace.Analyze
 {
@@ -59,6 +57,9 @@ namespace ProductionStackTrace.Analyze
 
         #endregion
 
+        /// <summary>
+        /// Initialize a new instance of <see cref="SymbolSearch"/>.
+        /// </summary>
         public SymbolSearch()
         {
             this.SymbolPaths = new List<string>();
@@ -91,7 +92,12 @@ namespace ProductionStackTrace.Analyze
             DbgHelp.SymSetOptions(DbgHelp.SYMOPT_DEBUG);
 
             var hProcess = new IntPtr(1);
-            DbgHelp.SymInitialize(hProcess, string.Join(";", this.SymbolPaths), false);
+#if TARGET_NET_20
+            var searchPath = string.Join(";", this.SymbolPaths.ToArray());
+#else
+            var searchPath = string.Join(";", this.SymbolPaths);
+#endif
+            DbgHelp.SymInitialize(hProcess, searchPath, false);
 
             var filePath = new StringBuilder(256);
             var guidHandle = GCHandle.Alloc(guid, GCHandleType.Pinned);
