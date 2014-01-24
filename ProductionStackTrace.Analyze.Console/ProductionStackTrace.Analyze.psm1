@@ -20,10 +20,10 @@ function Convert-ProductionStackTrace {
     $analyzerExe = (Join-Path $analyzerExe "ProductionStackTrace.Analyze.Console.exe")
 
     if (!$logfile -and !$outfile) {
-        Start-Process $analyzerExe
+        Start-Process $analyzerExe "-vs"
     } elseif (!$outfile) {
-        Get-Content $logfile | & $analyzerExe
+        Get-Content $logfile | & $analyzerExe "-vs"
     } else {
-        Get-Content $logfile | & $analyzerExe | Out-File $outfile
+        Get-Content $logfile | & $analyzerExe "-vs" | Out-File $outfile
     }
 }
