@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
     <PackageOutputDir>bin\$(Configuration)</PackageOutputDir>
-      <NuGetCommandExtra>-NoPackageAnalysis</NuGetCommandExtra>
+    <NuGetCommandExtra>-NoPackageAnalysis</NuGetCommandExtra>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,7 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="init.ps1" />
     <None Include="ProductionStackTrace.Analyze.Console.nuspec" />
+    <None Include="ProductionStackTrace.Analyze.psm1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProductionStackTrace.Analyze\ProductionStackTrace.Analyze.csproj">

@@ -48,11 +48,11 @@ Differences with original stack trace (i.e. `ex.ToString()`):
 
 Analyzing these stack traces is simple with an associated _analyzer_ application.
 
-1. Install the **ProductionStackTrace Analyze Tools** [NuGet package](https://www.nuget.org/packages/ProductionStackTrace.Analyze.Console) - it's a solution-level tools package:<br/>
+1. Install the **ProductionStackTrace Analyze Tool** [NuGet package](https://www.nuget.org/packages/ProductionStackTrace.Analyze.Console) - it's a solution-level tools package:<br/>
 `PM> Install-Package ProductionStackTrace.Analyze.Console`
 
 2. This will add a PowerShell command to the Package Manager Console - to launch it:<br/>
-`PM> ProductionStackTrace-Analyze`
+`PM> Convert-ProductionStackTrace`
 
 Copy-paste the stack trace into the window, to get the converted stack trace with original source line mappings:
 
@@ -63,10 +63,14 @@ System.Exception: Test exception
 
 You can also convert the entire log file:
 
-`PM> ProductionStackTrace-Analyze <logfile> <outfile>`
+`PM> Convert-ProductionStackTrace <logfile> <outfile>`
 
 ## Embedding
 
 If you want to embed analyzing into your own automated process, you can just get the binary files under `tools` folder in the extracted package folder.
 
 Alternatively, there is a **ProductionStackTrace Analyze** NuGet package, which contain the library which performs the conversion. 
+
+## Use with a logging framework
+
+TODO: how to embed into log4net

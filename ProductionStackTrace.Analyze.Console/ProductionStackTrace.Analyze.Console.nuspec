@@ -19,5 +19,7 @@
         <file src="bin\$configuration$\v2.0\*" exclude="**\*.tmp" target="tools\net20\" />
         <file src="bin\$configuration$\v4.0\*" exclude="**\*.tmp" target="tools\net40\" />
         <file src="bin\$configuration$\v4.5\*" exclude="**\*.tmp" target="tools\net45\" />
+        <file src="init.ps1" target="tools\" />
+        <file src="*.psm1" target="tools\" />
     </files>
 </package>
