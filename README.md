@@ -8,22 +8,16 @@
 [2]: http://www.lionhack.com/2014/01/14/advanced-dotnet-debugging-pdbs-and-symbols/
 [3]: http://msdn.microsoft.com/en-us/library/windows/desktop/ms680693(v=vs.85).aspx
 
-<style>
-.cmd {background-color:#000;color:#fff;font-size:120%;overflow:visible}
-</style>
-
 ## Usage
 
 1. Install the **ProductionStackTrace** [NuGet package][1]
 
-    <pre class="cmd">
-    PM> Install-Package ProductionStackTrace
-    </pre>
+        PM> Install-Package ProductionStackTrace
 
 2. In your code, where you log exceptions:
    
-   <pre><code language="c-sharp">
-    <b>using ProductionStackTrace;</b>
+   <pre lang="csharp"><code>
+    using ProductionStackTrace;
     ...
     try
     {
@@ -31,7 +25,7 @@
     }
     catch (Exception ex)
     {
-        var trace = <b>ExceptionReporting.GetExceptionReport(ex);</b>
+        var trace = ExceptionReporting.GetExceptionReport(ex);
         Console.WriteLine(trace);
     }
    </code></pre>
@@ -69,14 +63,11 @@ Analyzing these stack traces is simple with an associated _analyzer_ application
 
 1. Install the **ProductionStackTrace Analyze Tool** [NuGet package](https://www.nuget.org/packages/ProductionStackTrace.Analyze.Console) - it's a solution-level tools package:
 
-    <pre class="cmd">
-    PM> Install-Package ProductionStackTrace.Analyze.Console
-    </pre>
+        PM> Install-Package ProductionStackTrace.Analyze.Console
 
 2. This will add a PowerShell command to the Package Manager Console - to launch it:
-    <pre class="cmd">
-    PM> Convert-ProductionStackTrace
-    </pre>
+
+        PM> Convert-ProductionStackTrace
 
 Copy-paste the stack trace into the window, to get the converted stack trace with original source line mappings:
 
@@ -87,9 +78,7 @@ System.Exception: Test exception
 
 You can also convert the entire log file:
 
-<pre class="cmd">
-PM> Convert-ProductionStackTrace [logfile] [outfile]
-</pre>
+    PM> Convert-ProductionStackTrace [logfile] [outfile]
 
 ## Embedding
 
@@ -111,7 +100,7 @@ To override it, you have several choices:
 
 The 3rd choice is obviously better, if your logging framework supports it. Below is an example of how to do it with the widely popular `log4net`.
 
-<pre lang="csharp" style="overflow: visible">
+<pre lang="csharp">
 <code>
 [assembly: log4net.Config.Plugin(
     typeof(ProductionStackTraceLog4NetPlugin))]
