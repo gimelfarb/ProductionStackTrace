@@ -6,6 +6,7 @@ for /f %%i in ('git status -s ^| find /C " "') do set UNCOMMITED_CHANGES=%%i
 for /f %%i in ('git rev-list origin/master..HEAD --count') do set UNPUSHED_COUNT=%%i
 
 if "%~1" == "deploy" goto :deploy
+if "%~1" == "package" goto :package
 
 :build
 set MSBUILDDIR=%ProgramFiles(x86)%\MSBuild\12.0\bin
@@ -14,14 +15,19 @@ set MSBUILDDIR=%ProgramFiles(x86)%\MSBuild\12.0\bin
 
 exit /b
 
-:deploy
-if %UNCOMMITED_CHANGES% NEQ 0 goto :uncommited
-
+:package
 if not exist "%~dp0\_deploy" mkdir "%~dp0\_deploy"
 del /S /Q "%~dp0\_deploy\*.*"
 
 set MSBUILDPARAMS=/p:WriteNuGetVersionToFile=true "/p:PackageOutputDir=%~dp0\_deploy"
 call :build
+
+exit /b
+
+:deploy
+if %UNCOMMITED_CHANGES% NEQ 0 goto :uncommited
+
+call :package
 
 set /p VERSION=<_deploy\.version.txt
 if "%VERSION%"=="" goto :error
