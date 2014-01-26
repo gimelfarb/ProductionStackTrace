@@ -13,6 +13,7 @@
             Analyze stack traces produced by ProductionStackTrace - source line info without deploying PDBs
             Usage &amp; documentation is at: https://github.com/gimelfarb/ProductionStackTrace
         </description>
+        <summary>Analyze stack traces produced by ProductionStackTrace - source line info without deploying PDBs</summary>
         <copyright>Copyright 2014 by Lev Gimelfarb</copyright>
         <tags>logging unhandled exception stacktrace productionstacktrace production</tags>
     </metadata>
