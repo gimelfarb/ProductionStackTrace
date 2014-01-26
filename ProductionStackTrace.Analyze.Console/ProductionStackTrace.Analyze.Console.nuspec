@@ -9,7 +9,10 @@
         <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
         <projectUrl>https://github.com/gimelfarb/ProductionStackTrace</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Analyze stack traces produced by ProductionStackTrace - source line info without deploying PDBs</description>
+        <description>
+            Analyze stack traces produced by ProductionStackTrace - source line info without deploying PDBs
+            Usage &amp; documentation is at: https://github.com/gimelfarb/ProductionStackTrace
+        </description>
         <copyright>Copyright 2014 by Lev Gimelfarb</copyright>
         <tags>logging unhandled exception stacktrace productionstacktrace production</tags>
     </metadata>

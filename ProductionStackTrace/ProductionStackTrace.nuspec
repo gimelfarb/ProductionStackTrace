@@ -9,7 +9,12 @@
         <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
         <projectUrl>https://github.com/gimelfarb/ProductionStackTrace</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Full information stack trace without deploying PDBs</description>
+        <description>
+            Full information stack trace without deploying PDBs
+            Don't want to deploy PDBs, but still get exception stack traces that map to original source line numbers? Want to have your cake and eat it too?
+            ProductionStackTrace is intended to run in Production, without any access to PDB symbol files. It produces a stack trace with enough information to be analyzed by the techies back on the base with a help of a Symbol Store to get original source code line numbers.
+            Usage &amp; documentation is at: https://github.com/gimelfarb/ProductionStackTrace
+        </description>
         <copyright>Copyright 2014 by Lev Gimelfarb</copyright>
         <tags>logging unhandled exception stacktrace productionstacktrace production</tags>
     </metadata>
