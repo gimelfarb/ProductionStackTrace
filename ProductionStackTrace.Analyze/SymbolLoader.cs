@@ -92,6 +92,8 @@ namespace ProductionStackTrace.Analyze
             IDiaSymbol symMethod;
             _session.findSymbolByToken((uint)methodMetadataToken, SymTagEnum.SymTagFunction, out symMethod);
 
+            if (symMethod == null) return null;
+
             var rvaMethod = symMethod.relativeVirtualAddress;
             rvaMethod += (uint)ilOffset;
 
