@@ -19,7 +19,7 @@ namespace ProductionStackTrace.Analyze
         //         at MyAssembly!0x1234567!MyAssembly.Class1.A() +0xc
 
         private static readonly Regex s_regexStackTraceLine =
-            new Regex(@"^\s*at\s+(?<Assembly>[^<>:\""/\\|?*\u0000-\u001f!]+)!0x(?<MDToken>[0-9a-f]+)!(?<Method>[^\(]+)\((?<Args>[^\)]*)\)\s+\+0x(?<ILOffset>[0-9a-f]+)", RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+            new Regex(@"^\s*(?<AtName>(\p{L}*){1,4})\s+(?<Assembly>[^<>:\""/\\|?*\u0000-\u001f!]+)!0x(?<MDToken>[0-9a-f]+)!(?<Method>[^\(]+)\((?<Args>[^\)]*)\)\s+\+0x(?<ILOffset>[0-9a-f]+)", RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         // Regex to detect a separator line ('=================')
 
@@ -157,6 +157,7 @@ namespace ProductionStackTrace.Analyze
                 var m = s_regexStackTraceLine.Match(line);
                 if (m != Match.Empty)
                 {
+                    var atName = m.Groups["AtName"].ToString();
                     var assemblyName = m.Groups["Assembly"].ToString();
                     var mdTokenStr = m.Groups["MDToken"].ToString();
                     var ilOffsetStr = m.Groups["ILOffset"].ToString();
@@ -173,7 +174,9 @@ namespace ProductionStackTrace.Analyze
                             // Print out the stack frame standard portion in any case, even if we fail
                             // to load the symbols file
 
-                            w.Write("   at ");
+                            w.Write("   ");
+                            w.Write(atName);
+                            w.Write(" ");
                             w.Write(m.Groups["Method"]);
                             w.Write("(");
                             w.Write(m.Groups["Args"]);
