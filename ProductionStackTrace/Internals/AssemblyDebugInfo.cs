@@ -18,6 +18,7 @@ namespace ProductionStackTrace.Internals
         {
         }
 
+#if !SILVERLIGHT
         /// <summary>
         /// Retrieve PDB information from Assembly, by reading it's PE header.
         /// </summary>
@@ -88,6 +89,7 @@ namespace ProductionStackTrace.Internals
                 Path = path
             };
         }
+#endif
 
         #region Struct definitions
 

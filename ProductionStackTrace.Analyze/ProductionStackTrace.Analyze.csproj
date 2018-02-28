@@ -34,7 +34,7 @@
   <ItemGroup>
     <Reference Include="dia2lib" Condition="'$(TargetFrameworkVersion)' != 'v2.0'">
       <HintPath>..\Lib\dia2lib\net40\dia2lib.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="dia2lib" Condition="'$(TargetFrameworkVersion)' == 'v2.0'">
       <HintPath>..\Lib\dia2lib\net20\dia2lib.dll</HintPath>
@@ -66,6 +66,9 @@
   -->
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="$(SolutionDir)\.nuget\BuildCommon.targets" />
+  <PropertyGroup>
+    <NuspecFile Condition="'$(NuspecFile)' == ''">$(ProjectDir)$(ProjectName).nuspec</NuspecFile>
+  </PropertyGroup>
   <Target Name="AssemblyMerge" AfterTargets="PrepareForRun" Condition="'$(TargetFrameworkVersion)' == 'v2.0'">
     <MakeDir Directories="$(TargetDir)merged" />
     <PropertyGroup>
@@ -86,5 +89,6 @@
   <Target Name="AfterBuild" Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;Configuration=$(Configuration);Platform=$(Platform)" />
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v2.0;Configuration=$(Configuration);Platform=$(Platform)" />
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="BuildPackage" Condition="'$(BuildPackageIfMarked)' == 'true' And $([System.IO.File]::Exists($(NuspecFile)))" />
   </Target>
 </Project>

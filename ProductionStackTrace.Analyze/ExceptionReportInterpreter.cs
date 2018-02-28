@@ -30,7 +30,7 @@ namespace ProductionStackTrace.Analyze
         // MODULE: AssemblyName => AssemblyFullyQualifiedName; G:27657a27fg376787d6; A:1
 
         private static readonly Regex s_regexAssemblyMapping =
-            new Regex(@"MODULE: (?<Assembly>[^\s]+(?=\s+\=>))\s+\=>\s+(?<AssemblyFQN>[^;]+)(;\s+(?<KeyValue>[a-z]+\:[^;]+))+", RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+            new Regex(@"MODULE: (?<Assembly>[^\s]+(?=\s+\=>))\s+\=>\s+(?<AssemblyFQN>[^;]+)(;(\s+)?(?<KeyValue>[a-z]+\:[^;]+)?)+", RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         private SymbolSearch _symSearch;
 
@@ -101,6 +101,13 @@ namespace ProductionStackTrace.Analyze
                                 info.Attributes[kv[0]] = kv[1];
                             }
 
+                            // PDB filename is derived from assembly name + '.pdb' extension
+
+                            var assemblyFileName = info.FullyQualifiedName;
+                            int idxShortNameEnd = assemblyFileName.IndexOf(',');
+                            if (idxShortNameEnd > 0) assemblyFileName = assemblyFileName.Substring(0, idxShortNameEnd);
+                            var pdbFileName = assemblyFileName + ".pdb";
+
                             // If GUID and Age are specified, that means that assembly has debug information
                             // and the correspodning PDB file would have the matching GUID + Age attributes
 
@@ -117,20 +124,24 @@ namespace ProductionStackTrace.Analyze
                                     info.PdbGuid = pdbGuid;
                                     info.fPdbSpecified = true;
 
-                                    // PDB filename is derived from assembly name + '.pdb' extension
-
-                                    var assemblyFileName = info.FullyQualifiedName;
-                                    int idxShortNameEnd = assemblyFileName.IndexOf(',');
-                                    if (idxShortNameEnd > 0) assemblyFileName = assemblyFileName.Substring(0, idxShortNameEnd);
-
                                     // Lookup PDB file using configured Symbol Search Paths. If found, then
                                     // load PDB symbol information - it will be used below to find source line numbers
 
-                                    info.PdbPath = _symSearch.FindPdbFile(assemblyFileName + ".pdb", info.PdbGuid, info.PdbAge);
-                                    if (info.PdbPath != null)
-                                        info.PdbSymbolLoader = SymbolLoader.Load(info.PdbPath);
+                                    info.PdbPath = _symSearch.FindPdbFile(pdbFileName, info.PdbGuid, info.PdbAge);
                                 }
                             }
+                            else
+                            {
+                                // try to search for it anyway
+                                info.PdbPath = _symSearch.FindPdbFile(pdbFileName);
+                                if (info.PdbPath != null)
+                                {
+                                    info.fPdbSpecified = true;
+                                }
+                            }
+
+                            if (info.PdbPath != null)
+                                info.PdbSymbolLoader = SymbolLoader.Load(info.PdbPath);
 
                             mapping[assemblyName] = info;
                         }

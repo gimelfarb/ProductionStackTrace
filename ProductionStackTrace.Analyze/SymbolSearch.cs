@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Dia2Lib;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -115,6 +117,33 @@ namespace ProductionStackTrace.Analyze
             }
 
             return filePath.ToString();
+        }
+
+        /// <summary>
+        /// Looks through the configured symbol paths to find a PDB symbol
+        /// file matching specified name.
+        /// </summary>
+        /// <param name="pdbFileName">Name of the PDB file.</param>
+        /// <returns>The pdb file path or null the pdf file wasn't found.</returns>
+        public string FindPdbFile(string pdbFileName)
+        {
+            foreach (string symbolPath in this.SymbolPaths)
+            {
+                string filePath = Path.Combine(symbolPath, pdbFileName);
+                if (File.Exists(filePath))
+                {
+                    DiaSourceClass dia = new DiaSourceClass();
+                    dia.loadDataFromPdb(filePath);
+                    IDiaSession session;
+                    dia.openSession(out session);
+
+                    IDiaSymbol symbol = session.globalScope;
+
+                    return FindPdbFile(pdbFileName, symbol.guid, (int)symbol.age);
+                }
+            }
+
+            return null;
         }
     }
 }

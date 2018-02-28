@@ -23,6 +23,7 @@
         <file src="bin\$configuration$\v2.0\*" exclude="**\*.tmp" target="lib\net20\" />
         <file src="bin\$configuration$\v4.0\*" exclude="**\*.tmp" target="lib\net40\" />
         <file src="bin\$configuration$\v4.5\*" exclude="**\*.tmp" target="lib\net45\" />
+        <file src="bin\$configuration$\sl5\*" exclude="**\*.tmp" target="lib\sl5\" />
         <file src="**\*.cs" exclude="obj\**" target="src" />
     </files>
 </package>
