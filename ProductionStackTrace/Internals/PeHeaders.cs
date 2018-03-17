@@ -416,11 +416,13 @@ namespace ProductionStackTrace.Internals
         {
         }
 
+#if !SILVERLIGHT
         public static PeHeaders FromAssembly(Assembly assembly)
         {
             var modulePtr = Marshal.GetHINSTANCE(assembly.ManifestModule);
             return FromUnmanagedPtr(modulePtr);
         }
+#endif
 
         public static PeHeaders FromUnmanagedPtr(IntPtr memoryPtr)
         {
@@ -512,7 +514,12 @@ namespace ProductionStackTrace.Internals
 
             // Pin the managed memory while, copy it out the data, then unpin it
             GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+#if SILVERLIGHT
+            T theStructure = default(T);
+            Marshal.PtrToStructure(handle.AddrOfPinnedObject(), theStructure);
+#else
             T theStructure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+#endif
             handle.Free();
 
             return theStructure;
@@ -520,7 +527,12 @@ namespace ProductionStackTrace.Internals
 
         private static T FromMemoryPtr<T>(IntPtr memPtr, ref long index)
         {
+#if SILVERLIGHT
+            T obj = default(T);
+            Marshal.PtrToStructure(new IntPtr(memPtr.ToInt64() + index), obj);
+#else
             var obj = (T)Marshal.PtrToStructure(new IntPtr(memPtr.ToInt64() + index), typeof(T));
+#endif
             index += Marshal.SizeOf(typeof(T));
             return obj;
         }
@@ -594,7 +606,11 @@ namespace ProductionStackTrace.Internals
                 // Add in the number of seconds since 1970/1/1
                 returnValue = returnValue.AddSeconds(fileHeader.TimeDateStamp);
                 // Adjust to local timezone
+#if SILVERLIGHT
+                returnValue += TimeZoneInfo.Local.GetUtcOffset(returnValue);
+#else
                 returnValue += TimeZone.CurrentTimeZone.GetUtcOffset(returnValue);
+#endif
 
                 return returnValue;
             }

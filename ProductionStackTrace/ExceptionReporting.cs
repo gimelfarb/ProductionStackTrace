@@ -38,6 +38,7 @@ namespace ProductionStackTrace
                 {
                     var info = ctx.AssemblyInfo[key];
                     builder.AppendFormat("MODULE: {0} => {1};", key, info.Assembly.FullName);
+#if !SILVERLIGHT
                     if (info.DebugInfo != null)
                     {
                         builder.AppendFormat(" G:{0:N}; A:{1}", info.DebugInfo.Guid, info.DebugInfo.Age);
@@ -46,6 +47,7 @@ namespace ProductionStackTrace
                         if (!string.Equals(pdbFileName, info.ShortName + ".pdb", StringComparison.OrdinalIgnoreCase))
                             builder.Append("; F:").Append(pdbFileName);
                     }
+#endif
                     builder.AppendLine();
                 }
             }
@@ -228,7 +230,9 @@ namespace ProductionStackTrace
             if (info == null)
             {
                 ctx.AssemblyInfo.Add(assemblyName, info = new AssemblyReportInfo() { Assembly = assembly, ShortName = originalAssemblyName });
+#if !SILVERLIGHT
                 info.DebugInfo = AssemblyDebugInfo.ReadAssemblyDebugInfo(assembly);
+#endif
             }
         }
 
@@ -243,7 +247,9 @@ namespace ProductionStackTrace
         private class AssemblyReportInfo
         {
             public Assembly Assembly;
+#if !SILVERLIGHT
             public AssemblyDebugInfo DebugInfo;
+#endif
             public string ShortName;
         }
 

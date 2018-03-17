@@ -67,8 +67,12 @@
   -->
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="$(SolutionDir)\.nuget\BuildCommon.targets" />
+  <PropertyGroup>
+    <NuspecFile Condition="'$(NuspecFile)' == ''">$(ProjectDir)$(ProjectName).nuspec</NuspecFile>
+  </PropertyGroup>
   <Target Name="AfterBuild" Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;Configuration=$(Configuration);Platform=$(Platform)" />
     <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v2.0;Configuration=$(Configuration);Platform=$(Platform)" />
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="BuildPackage" Condition="'$(BuildPackageIfMarked)' == 'true' And $([System.IO.File]::Exists($(NuspecFile)))" />
   </Target>
 </Project>

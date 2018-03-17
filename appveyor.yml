@@ -1,0 +1,11 @@
+version: 1.0.{build}
+build_script:
+- cmd: build.cmd package
+test_script:
+- cmd: >-
+    nuget install NUnit.Runners -Version 2.6.4
+
+    .\NUnit.Runners.2.6.4\tools\nunit-console-x86.exe .\ProductionStackTrace.Test\bin\Release\ProductionStackTrace.Test.dll
+artifacts:
+- path: _deploy\*.nupkg
+  name: NuGet Package

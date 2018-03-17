@@ -19,24 +19,12 @@
         <!-- Set compile time constants to detect target framework version during compilation -->
         <CustomConstants Condition=" '$(TargetFrameworkVersion)' == 'v2.0' ">TARGET_NET_20</CustomConstants>
         <CustomConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">TARGET_NET_40</CustomConstants>
+        <CustomConstants Condition=" '$(TargetFrameworkIdentifier)' == 'Silverlight' ">SILVERLIGHT</CustomConstants>
         <DefineConstants Condition=" '$(DefineConstants)' != '' And '$(CustomConstants)' != '' ">$(DefineConstants);</DefineConstants>
         <DefineConstants>$(DefineConstants)$(CustomConstants)</DefineConstants>
     </PropertyGroup>
     
     
-    <!--
-        Define BuildPackage if .nuspec specified
-    -->
-    <PropertyGroup>
-        <NuspecFile Condition="'$(NuspecFile)' == ''">$(ProjectDir)$(ProjectName).nuspec</NuspecFile>
-        <BuildPackage Condition="'$(BuildPackageIfMarked)' == 'true' And $([System.IO.File]::Exists($(NuspecFile)))">true</BuildPackage>
-        <BuildDependsOn Condition="!$(BuildDependsOn.Contains('BuildPackage;')) And '$(BuildPackage)' == 'true'">
-            $(BuildDependsOn);
-            BuildPackage;
-        </BuildDependsOn>
-    </PropertyGroup>
-    
-
     <!--
         Define NuGet pack command based on the NuSpec and found version.
     -->
