@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\ILMerge.3.0.29\build\ILMerge.props" Condition="Exists('..\packages\ILMerge.3.0.29\build\ILMerge.props')" />
+  <Import Project="..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\build\Microsoft.Diagnostics.Tracing.TraceEvent.props" Condition="Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\build\Microsoft.Diagnostics.Tracing.TraceEvent.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,12 +11,15 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ProductionStackTrace.Analyze</RootNamespace>
     <AssemblyName>ProductionStackTrace.Analyze</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
     <PackageOutputDir>bin\$(Configuration)</PackageOutputDir>
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,15 +37,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dia2lib" Condition="'$(TargetFrameworkVersion)' != 'v2.0'">
-      <HintPath>..\Lib\dia2lib\net40\dia2lib.dll</HintPath>
+    <Reference Include="Dia2Lib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="dia2lib" Condition="'$(TargetFrameworkVersion)' == 'v2.0'">
-      <HintPath>..\Lib\dia2lib\net20\dia2lib.dll</HintPath>
+      <HintPath>..\lib\Dia2Lib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" Condition="'$(TargetFrameworkVersion)' != 'v2.0'" />
+    <Reference Include="Microsoft.Diagnostics.FastSerialization, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\lib\net45\Microsoft.Diagnostics.FastSerialization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Diagnostics.Tracing.TraceEvent, Version=2.0.48.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\lib\net45\Microsoft.Diagnostics.Tracing.TraceEvent.dll</HintPath>
+    </Reference>
+    <Reference Include="OSExtensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\lib\net45\OSExtensions.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="TraceReloggerLib, Version=0.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\lib\net45\TraceReloggerLib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
@@ -54,9 +70,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="ProductionStackTrace.Analyze.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\build\Microsoft.Diagnostics.Tracing.TraceEvent.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.2.0.48\build\Microsoft.Diagnostics.Tracing.TraceEvent.props'))" />
+    <Error Condition="!Exists('..\packages\ILMerge.3.0.29\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILMerge.3.0.29\build\ILMerge.props'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -64,27 +86,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Import Project="$(SolutionDir)\.nuget\BuildCommon.targets" />
-  <Target Name="AssemblyMerge" AfterTargets="PrepareForRun" Condition="'$(TargetFrameworkVersion)' == 'v2.0'">
-    <MakeDir Directories="$(TargetDir)merged" />
-    <PropertyGroup>
-      <ILMergeCommand>"$(SolutionDir)packages\ilmerge.2.13.0307\ILMerge.exe"</ILMergeCommand>
-      <ILMergeCommand>$(ILMergeCommand) "/out:$(TargetDir)merged\$(TargetFileName)"</ILMergeCommand>
-      <ILMergeCommand>$(ILMergeCommand) /targetplatform:"v2"</ILMergeCommand>
-      <ILMergeCommand>$(ILMergeCommand) "$(TargetPath)"</ILMergeCommand>
-      <ILMergeCommand>$(ILMergeCommand) "$(TargetDir)dia2lib.dll"</ILMergeCommand>
-    </PropertyGroup>
-    <Exec Command="$(ILMergeCommand)" />
-    <Delete Files="$(TargetDir)dia2lib.dll" />
-    <ItemGroup>
-      <ILMergedFiles Include="$(TargetDir)merged\**" />
-    </ItemGroup>
-    <Copy SourceFiles="@(ILMergedFiles)" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true" />
-    <RemoveDir Directories="$(TargetDir)merged" />
-  </Target>
-  <Target Name="AfterBuild" Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
-    <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v4.0;TargetFrameworkProfile=Client;Configuration=$(Configuration);Platform=$(Platform)" />
-    <MSBuild Projects="$(MSBuildProjectFile)" Targets="Build" Properties="TargetFrameworkVersion=v2.0;Configuration=$(Configuration);Platform=$(Platform)" />
-  </Target>
 </Project>
