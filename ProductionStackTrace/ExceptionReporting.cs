@@ -244,5 +244,19 @@ namespace ProductionStackTrace {
 				return false;
 			}
 		}
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+		public delegate IntPtr MarshalGetHINSTANCEDel(Module module);
+
+		public static MarshalGetHINSTANCEDel MarshalGetHINSTANCE = MarshalGetHINSTANCEDefault;
+
+		internal static IntPtr MarshalGetHINSTANCEDefault(Module module) {//doesn't exist until dotnet 2.1
+			var type = typeof(System.Runtime.InteropServices.Marshal);
+			var method = type.GetMethod("GetHINSTANCE");
+			if (method == null)
+				throw new Exception("Unable to get System.Runtime.InteropServices.Marshal.GetHINSTANCE method");
+			return (IntPtr)method.Invoke(null, new[] { module });
+		}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
+
 }

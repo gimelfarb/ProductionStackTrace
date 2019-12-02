@@ -30,7 +30,9 @@ namespace ProductionStackTrace.Internals {
 			// binary on Windows - DLL or EXE - following the PE format.
 			// http://msdn.microsoft.com/en-us/library/windows/desktop/ms680547(v=vs.85).aspx
 
-			var modulePtr = Marshal.GetHINSTANCE(assembly.ManifestModule);
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				return null;
+			var modulePtr = ExceptionReporting.MarshalGetHINSTANCE(assembly.ManifestModule);
 
 			// Parses PE headers structure from the module base address pointer
 

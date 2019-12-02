@@ -406,7 +406,7 @@ namespace ProductionStackTrace.Internals {
 		}
 
 		public static PeHeaders FromAssembly(Assembly assembly) {
-			var modulePtr = Marshal.GetHINSTANCE(assembly.ManifestModule);
+			var modulePtr = ExceptionReporting.MarshalGetHINSTANCE(assembly.ManifestModule);
 			return FromUnmanagedPtr(modulePtr);
 		}
 
@@ -556,7 +556,8 @@ namespace ProductionStackTrace.Internals {
 				// Add in the number of seconds since 1970/1/1
 				returnValue = returnValue.AddSeconds(fileHeader.TimeDateStamp);
 				// Adjust to local timezone
-				returnValue += TimeZone.CurrentTimeZone.GetUtcOffset(returnValue);
+				
+				returnValue += System.TimeZoneInfo.Local.GetUtcOffset(returnValue);
 
 				return returnValue;
 			}

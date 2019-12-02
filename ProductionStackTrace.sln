@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{03B97452-6
 		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTraceStd", "ProductionStackTraceStd\ProductionStackTraceStd.csproj", "{364E2C08-1567-4A40-B4EA-69DD0F9E5061}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{AD70438D-18CF-46F5-84DD-4D79B9FB2876}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD70438D-18CF-46F5-84DD-4D79B9FB2876}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD70438D-18CF-46F5-84DD-4D79B9FB2876}.Release|Any CPU.Build.0 = Release|Any CPU
+		{364E2C08-1567-4A40-B4EA-69DD0F9E5061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{364E2C08-1567-4A40-B4EA-69DD0F9E5061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{364E2C08-1567-4A40-B4EA-69DD0F9E5061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{364E2C08-1567-4A40-B4EA-69DD0F9E5061}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

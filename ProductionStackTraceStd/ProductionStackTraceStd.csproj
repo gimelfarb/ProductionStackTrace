@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.0.5</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ProductionStackTrace\ExceptionEx.cs" Link="ExceptionEx.cs" />
+    <Compile Include="..\ProductionStackTrace\ExceptionReporting.cs" Link="ExceptionReporting.cs" />
+    <Compile Include="..\ProductionStackTrace\Internals\AssemblyDebugInfo.cs" Link="Internals\AssemblyDebugInfo.cs" />
+    <Compile Include="..\ProductionStackTrace\Internals\PeHeaders.cs" Link="Internals\PeHeaders.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Internals\" />
+  </ItemGroup>
+
+</Project>
