@@ -32,6 +32,8 @@ namespace ProductionStackTrace.Analyze
         private static readonly Regex s_regexAssemblyMapping =
             new Regex(@"MODULE: (?<Assembly>[^\s]+(?=\s+\=>))\s+\=>\s+(?<AssemblyFQN>[^;]+)(;\s+(?<KeyValue>[a-z]+\:[^;]+))+", RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
+		private static readonly Regex s_regexVersionMapping = new Regex(@"Version=(?<Version>[0-9\.]+)");
+
         private SymbolSearch _symSearch;
 
         /// <summary>
@@ -41,18 +43,26 @@ namespace ProductionStackTrace.Analyze
         {
             _symSearch = new SymbolSearch();
         }
+		public string AltDbgHelpDll;
 
         /// <summary>
         /// List of symbol search paths to pass to <see cref="SymbolSearch.SymbolPaths"/>.
         /// </summary>
-        public List<string> SymbolPaths { get { return _symSearch.SymbolPaths; } }
+        public Microsoft.Diagnostics.Symbols.SymbolPath SymbolPaths { get { return _symSearch.SymbolPaths; } }
 
-        /// <summary>
-        /// Helper to hold info about the assembly from parsed report.
-        /// </summary>
-        private class AssemblyMappedInfo
+		public string ExceptionFileToRead { get; set; }
+
+		public void ClearSymbolPaths() => _symSearch.ClearSymbolPaths();
+
+		/// <summary>
+		/// Helper to hold info about the assembly from parsed report.
+		/// </summary>
+		public class AssemblyMappedInfo
         {
             public string FullyQualifiedName = string.Empty;
+			public string AssemblyName;
+			public string PdbName => AssemblyName + ".pdb";
+			public string Version;
             public Dictionary<string, string> Attributes = new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
             public Guid PdbGuid;
             public int PdbAge;
@@ -100,11 +110,19 @@ namespace ProductionStackTrace.Analyze
                                 var kv = c.Value.Split(':');
                                 info.Attributes[kv[0]] = kv[1];
                             }
+							var match = s_regexVersionMapping.Match(info.FullyQualifiedName);
+							if (match.Success)
+								info.Version = match.Groups["Version"].ToString();
+							var assemblyFileName = info.FullyQualifiedName;
+							int idxShortNameEnd = assemblyFileName.IndexOf(',');
+							if (idxShortNameEnd > 0)
+								assemblyFileName = assemblyFileName.Substring(0, idxShortNameEnd);
+							info.AssemblyName = assemblyFileName;
 
-                            // If GUID and Age are specified, that means that assembly has debug information
-                            // and the correspodning PDB file would have the matching GUID + Age attributes
+							// If GUID and Age are specified, that means that assembly has debug information
+							// and the correspodning PDB file would have the matching GUID + Age attributes
 
-                            string pdbGuidStr, pdbAgeStr;
+							string pdbGuidStr, pdbAgeStr;
                             if (info.Attributes.TryGetValue("G", out pdbGuidStr) &&
                                 info.Attributes.TryGetValue("A", out pdbAgeStr))
                             {
@@ -119,15 +137,15 @@ namespace ProductionStackTrace.Analyze
 
                                     // PDB filename is derived from assembly name + '.pdb' extension
 
-                                    var assemblyFileName = info.FullyQualifiedName;
-                                    int idxShortNameEnd = assemblyFileName.IndexOf(',');
-                                    if (idxShortNameEnd > 0) assemblyFileName = assemblyFileName.Substring(0, idxShortNameEnd);
 
                                     // Lookup PDB file using configured Symbol Search Paths. If found, then
                                     // load PDB symbol information - it will be used below to find source line numbers
 
-                                    info.PdbPath = _symSearch.FindPdbFile(assemblyFileName + ".pdb", info.PdbGuid, info.PdbAge);
-                                    if (info.PdbPath != null)
+                                    info.PdbPath = _symSearch.FindPdbFile(info.PdbName, info.PdbGuid, info.PdbAge, info.Version);
+									if (info.PdbPath == null)
+										info.PdbPath = _symSearch.AltFindPdbFile(info);
+
+									if (info.PdbPath != null)
                                         info.PdbSymbolLoader = SymbolLoader.Load(info.PdbPath);
                                 }
                             }
