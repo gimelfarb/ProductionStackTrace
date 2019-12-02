@@ -93,7 +93,7 @@ namespace ProductionStackTrace {
 		/// <param name="ctx"></param>
 		/// <param name="builder"></param>
 		private static void GetStackTraceEx(Exception ex, ExceptionReportingContext ctx, ref StringBuilder builder) {
-			var st = new StackTrace(ex);
+			var st = new StackTrace(ex, true);
 			var strAt = GetRuntimeResourceString("Word_At") ?? "at";
 
 			bool isFirstLine = true;
@@ -153,12 +153,17 @@ namespace ProductionStackTrace {
 						builder.Append(name + " " + parameters[j].Name);
 					}
 					builder.Append(")");
-					var ilOffset = frame.GetILOffset();
-					if (ilOffset != -1) {
-						// Output the IL Offset, which we can later map to a filename+line,
-						// using information inside a matching PDB file
+					var file_name = frame.GetFileName();
+					if (!String.IsNullOrWhiteSpace(file_name)) {
+						builder.Append($" in {file_name}:line {frame.GetFileLineNumber()}");
+					} else {
+						var ilOffset = frame.GetILOffset();
+						if (ilOffset != -1) {
+							// Output the IL Offset, which we can later map to a filename+line,
+							// using information inside a matching PDB file
 
-						builder.AppendFormat(CultureInfo.InvariantCulture, " +0x{0:x}", ilOffset);
+							builder.AppendFormat(CultureInfo.InvariantCulture, " +0x{0:x}", ilOffset);
+						}
 					}
 					if (GetIsLastFrameFromForeignExceptionStackTrace(frame)) {
 						builder.Append(Environment.NewLine);
