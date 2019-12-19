@@ -109,14 +109,17 @@ namespace ProductionStackTrace {
 					builder.AppendFormat(CultureInfo.InvariantCulture, "   {0} ", new object[] { strAt });
 					Type declaringType = method.DeclaringType;
 					var no_file_info = String.IsNullOrWhiteSpace(frame.GetFileName());
-					if (declaringType != null && no_file_info) {
+					if (declaringType != null) {
 						// Output assembly short name, followed by method's metadata token,
 						// which is used to later lookup in PDB file
-
-						AppendAssemblyName(builder, declaringType.Assembly, ctx);
-						builder.Append("!");
-						builder.AppendFormat("0x{0:x8}", method.MetadataToken);
-						builder.Append("!");
+						if (!no_file_info)
+							AppendAssemblyName(builder, declaringType.Assembly, ctx, true);
+						else {
+							AppendAssemblyName(builder, declaringType.Assembly, ctx, false);
+							builder.Append("!");
+							builder.AppendFormat("0x{0:x8}", method.MetadataToken);
+							builder.Append("!");
+						}
 					}
 					builder.Append(frame.MethodInfo.ToString()); //frame.MethodInfo.Append(builder); //will require a PR approved before we can use
 
@@ -147,7 +150,7 @@ namespace ProductionStackTrace {
 		/// <param name="builder"></param>
 		/// <param name="assembly"></param>
 		/// <param name="ctx"></param>
-		private static void AppendAssemblyName(StringBuilder builder, Assembly assembly, ExceptionReportingContext ctx) {
+		private static void AppendAssemblyName(StringBuilder builder, Assembly assembly, ExceptionReportingContext ctx, bool record_only=false) {
 			var assemblyName = assembly.FullName;
 			int idxShortNameEnd = assemblyName.IndexOf(",");
 			if (idxShortNameEnd > 0) assemblyName = assemblyName.Substring(0, idxShortNameEnd);
@@ -162,8 +165,8 @@ namespace ProductionStackTrace {
 				if (Object.ReferenceEquals(info.Assembly, assembly)) break;
 				assemblyName = string.Format(CultureInfo.InvariantCulture, "{0}#{1}", originalAssemblyName, ++counter);
 			}
-
-			builder.Append(assemblyName);
+			if (!record_only)
+				builder.Append(assemblyName);
 
 			// Read information about associated PDB file from assembly
 
