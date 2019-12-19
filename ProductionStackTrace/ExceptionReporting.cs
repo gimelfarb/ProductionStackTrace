@@ -98,7 +98,7 @@ namespace ProductionStackTrace {
 
 			bool isFirstLine = true;
 			builder = builder ?? new StringBuilder(0xff);
-			foreach (var frame in st) {
+			foreach(var frame in st) { 
 				var method = frame.GetMethod();
 				if (method != null) {
 					if (isFirstLine) {
@@ -108,20 +108,23 @@ namespace ProductionStackTrace {
 					}
 					builder.AppendFormat(CultureInfo.InvariantCulture, "   {0} ", new object[] { strAt });
 					Type declaringType = method.DeclaringType;
+					var no_file_info = String.IsNullOrWhiteSpace(frame.GetFileName());
 					if (declaringType != null) {
 						// Output assembly short name, followed by method's metadata token,
 						// which is used to later lookup in PDB file
 
-						AppendAssemblyName(builder, declaringType.Assembly, ctx);
-						builder.Append("!");
-						builder.AppendFormat("0x{0:x8}", method.MetadataToken);
-						builder.Append("!");
+						AppendAssemblyName(builder, declaringType.Assembly, ctx);//always append assembly info even if source is local
+						if (no_file_info) {
+							builder.Append("!");
+							builder.AppendFormat("0x{0:x8}", method.MetadataToken);
+							builder.Append("!");
+						}
 					}
 					builder.Append(frame.MethodInfo.ToString()); //frame.MethodInfo.Append(builder); //will require a PR approved before we can use
 
-					var file_name = frame.GetFileName();
-					if (!String.IsNullOrWhiteSpace(file_name)) {
-						builder.Append($" in {file_name}:line {frame.GetFileLineNumber()}");
+					
+					if (! no_file_info) {
+						builder.Append($" in {frame.GetFileName()}:line {frame.GetFileLineNumber()}");
 					} else {
 						var ilOffset = frame.GetILOffset();
 						if (ilOffset != -1) {
