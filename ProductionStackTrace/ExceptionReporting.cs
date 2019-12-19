@@ -109,16 +109,14 @@ namespace ProductionStackTrace {
 					builder.AppendFormat(CultureInfo.InvariantCulture, "   {0} ", new object[] { strAt });
 					Type declaringType = method.DeclaringType;
 					var no_file_info = String.IsNullOrWhiteSpace(frame.GetFileName());
-					if (declaringType != null) {
+					if (declaringType != null && no_file_info) {
 						// Output assembly short name, followed by method's metadata token,
 						// which is used to later lookup in PDB file
 
-						AppendAssemblyName(builder, declaringType.Assembly, ctx);//always append assembly info even if source is local
-						if (no_file_info) {
-							builder.Append("!");
-							builder.AppendFormat("0x{0:x8}", method.MetadataToken);
-							builder.Append("!");
-						}
+						AppendAssemblyName(builder, declaringType.Assembly, ctx);
+						builder.Append("!");
+						builder.AppendFormat("0x{0:x8}", method.MetadataToken);
+						builder.Append("!");
 					}
 					builder.Append(frame.MethodInfo.ToString()); //frame.MethodInfo.Append(builder); //will require a PR approved before we can use
 
