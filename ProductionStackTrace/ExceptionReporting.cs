@@ -93,13 +93,12 @@ namespace ProductionStackTrace {
 		/// <param name="ctx"></param>
 		/// <param name="builder"></param>
 		private static void GetStackTraceEx(Exception ex, ExceptionReportingContext ctx, ref StringBuilder builder) {
-			var st = new StackTrace(ex, true);
+			var st = new EnhancedStackTrace(ex);
 			var strAt = GetRuntimeResourceString("Word_At") ?? "at";
 
 			bool isFirstLine = true;
 			builder = builder ?? new StringBuilder(0xff);
-			for (int i = 0; i < st.FrameCount; i++) {
-				StackFrame frame = st.GetFrame(i);
+			foreach (var frame in st) {
 				var method = frame.GetMethod();
 				if (method != null) {
 					if (isFirstLine) {
@@ -117,42 +116,9 @@ namespace ProductionStackTrace {
 						builder.Append("!");
 						builder.AppendFormat("0x{0:x8}", method.MetadataToken);
 						builder.Append("!");
-						builder.Append(declaringType.FullName.Replace('+', '.'));
-						builder.Append(".");
 					}
-					builder.Append(method.Name);
-					if ((method is MethodInfo) && ((MethodInfo)method).IsGenericMethod) {
-						Type[] genericArguments = ((MethodInfo)method).GetGenericArguments();
-						builder.Append("[");
-						int index = 0;
-						bool firstArg = true;
-						while (index < genericArguments.Length) {
-							if (!firstArg) {
-								builder.Append(",");
-							} else {
-								firstArg = false;
-							}
-							builder.Append(genericArguments[index].Name);
-							index++;
-						}
-						builder.Append("]");
-					}
-					builder.Append("(");
-					ParameterInfo[] parameters = method.GetParameters();
-					bool firstParam = true;
-					for (int j = 0; j < parameters.Length; j++) {
-						if (!firstParam) {
-							builder.Append(", ");
-						} else {
-							firstParam = false;
-						}
-						string name = "<UnknownType>";
-						if (parameters[j].ParameterType != null) {
-							name = parameters[j].ParameterType.Name;
-						}
-						builder.Append(name + " " + parameters[j].Name);
-					}
-					builder.Append(")");
+					builder.Append(frame.MethodInfo.ToString()); //frame.MethodInfo.Append(builder); //will require a PR approved before we can use
+
 					var file_name = frame.GetFileName();
 					if (!String.IsNullOrWhiteSpace(file_name)) {
 						builder.Append($" in {file_name}:line {frame.GetFileLineNumber()}");
