@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -21,6 +23,32 @@ namespace ProductionStackTrace.Internals {
 		/// <param name="assembly"></param>
 		/// <returns></returns>
 		public static AssemblyDebugInfo ReadAssemblyDebugInfo(Assembly assembly) {
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+				/*
+				 * Technically PEReader can take a pointer and the length of the assembly so could potentially use MarshalGetHINSTANCE like below
+				 * however that didn't exist until .net core 2.1 so for best compatability we will use PEReader which is .net core 1.0 and above
+				 * Downside of this is the assembly is re-read from disk once, but it should hopefully be a minor performance hit
+				 * 
+				 * */
+				if (!File.Exists(assembly.Location))
+					return null;
+				using (var stream = File.OpenRead(assembly.Location)) {
+					using (var peReader = new PEReader(stream)) {
+						foreach (var entry in peReader.ReadDebugDirectory()) {
+
+							if (entry.Type == DebugDirectoryEntryType.CodeView) {
+								var codeViewData = peReader.ReadCodeViewDebugDirectoryData(entry);
+								return new AssemblyDebugInfo() {
+									Guid = codeViewData.Guid,
+									Age = (uint)codeViewData.Age,
+									Path = codeViewData.Path
+								};
+							}
+						}
+					}
+				}
+				return null;
+			}
 			// The trick is that GetHINSTANCE returns the real HINSTANCE handler,
 			// which in Win32 API world is module's base address in memory
 			// http://msdn.microsoft.com/en-us/library/windows/desktop/aa383751(v=vs.85).aspx
@@ -30,8 +58,6 @@ namespace ProductionStackTrace.Internals {
 			// binary on Windows - DLL or EXE - following the PE format.
 			// http://msdn.microsoft.com/en-us/library/windows/desktop/ms680547(v=vs.85).aspx
 
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				return null;
 			var modulePtr = ExceptionReporting.MarshalGetHINSTANCE(assembly.ManifestModule);
 
 			// Parses PE headers structure from the module base address pointer
