@@ -192,7 +192,12 @@ namespace ProductionStackTrace.Analyze
                             // to load the symbols file
 
                             w.Write("   at ");
-                            w.Write(m.Groups["Method"]);
+                            var method = m.Groups["Method"].Value;
+                            var method_start = method.LastIndexOf(' ');
+                            if (method_start != -1)
+                                method = method.Substring(method_start+1);
+
+                            w.Write(method);
                             w.Write("(");
                             w.Write(m.Groups["Args"]);
                             w.Write(")");

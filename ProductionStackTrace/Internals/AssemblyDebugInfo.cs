@@ -23,7 +23,7 @@ namespace ProductionStackTrace.Internals {
 		/// <param name="assembly"></param>
 		/// <returns></returns>
 		public static AssemblyDebugInfo ReadAssemblyDebugInfo(Assembly assembly) {
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+			if (true || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
 				/*
 				 * Technically PEReader can take a pointer and the length of the assembly so could potentially use MarshalGetHINSTANCE like below
 				 * however that didn't exist until .net core 2.1 so for best compatability we will use PEReader which is .net core 1.0 and above

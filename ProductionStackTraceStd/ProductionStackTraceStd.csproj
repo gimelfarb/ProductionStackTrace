@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.0.6</Version>
+    <Version>1.0.13</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +10,7 @@
     <Compile Include="..\ProductionStackTrace\ExceptionReporting.cs" Link="ExceptionReporting.cs" />
     <Compile Include="..\ProductionStackTrace\Internals\AssemblyDebugInfo.cs" Link="Internals\AssemblyDebugInfo.cs" />
     <Compile Include="..\ProductionStackTrace\Internals\PeHeaders.cs" Link="Internals\PeHeaders.cs" />
+    <Compile Include="..\ProductionStackTrace\LogClasses.cs" Link="LogClasses.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ben.Demystifier" Version="0.1.4" />
+    <PackageReference Include="Ben.Demystifier" Version="0.1.6" />
   </ItemGroup>
 
 </Project>

@@ -65,7 +65,7 @@ namespace ProductionStackTrace.Analyze {
 
 
 					//if this fails need to call: regsvr32 "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide\msdia140.dll"
-
+					// or regsvr32 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\Common7\IDE\msdia140.dll"
 					//return new DiaSource();
 					return (IDiaDataSource)Activator.CreateInstance(Type.GetTypeFromCLSID(s_msdiaGuids[i]));
 				} catch (COMException) {
