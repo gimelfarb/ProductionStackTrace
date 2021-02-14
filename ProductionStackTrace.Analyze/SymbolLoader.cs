@@ -59,19 +59,19 @@ namespace ProductionStackTrace.Analyze {
 		/// </summary>
 		/// <returns></returns>
 		private static IDiaDataSource CoCreateDiaSource() {
-			var i = 0;
-			while (true) {
+			for (var i = 0; i < s_msdiaGuids.Length; i++) { 
 				try {
 
 
-					//if this fails need to call: regsvr32 "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide\msdia140.dll"
+					//if this fails need to call AS ADMIN: regsvr32 "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide\msdia140.dll"
 					// or regsvr32 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\Common7\IDE\msdia140.dll"
 					//return new DiaSource();
 					return (IDiaDataSource)Activator.CreateInstance(Type.GetTypeFromCLSID(s_msdiaGuids[i]));
 				} catch (COMException) {
-					if (++i >= s_msdiaGuids.Length) new Exception(@"Unable to create DiaSource you need to run regsvr32 on the path to msdia140.dll like: regsvr32 ""c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide\msdia140.dll""");
+
 				}
 			}
+			throw new Exception(@"Unable to create DiaSource you need to run regsvr32 on the path to msdia140.dll like: regsvr32 ""c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide\msdia140.dll""");
 		}
 
 		/// <summary>
