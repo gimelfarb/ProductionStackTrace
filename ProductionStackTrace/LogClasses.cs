@@ -36,12 +36,19 @@ namespace ProductionStackTrace {
 				return;
 			from_raw = false;
 			var method = frame.GetMethod();
-			MethodMetadataToken = method.MetadataToken;
+			MethodMetadataToken = GetMetadataToken(method);
 			IlOffset = frame.GetILOffset();
 			SourceFileName = frame.GetFileName();
 			SourceFileLine = frame.GetFileLineNumber();
 			MethodInfo = frame.MethodInfo.ToString();
 			IsLastFrameFromForeignExceptionStackTrace = ExceptionReporting.GetIsLastFrameFromForeignExceptionStackTrace(frame);
+		}
+		private int GetMetadataToken(System.Reflection.MethodBase method_info) {
+			try { 
+				return method_info.MetadataToken;
+			} catch (InvalidOperationException) {
+				return 0;
+			}
 		}
 		public override string ToString() { var sb = new StringBuilder(0xff); ToString(sb); return sb.ToString(); }
 		public void ToString(StringBuilder builder) {
@@ -52,7 +59,7 @@ namespace ProductionStackTrace {
 			if (no_file_info) {
 				builder.Append(ShortAssemblyName);
 				builder.Append("!");
-				builder.AppendFormat("0x{0:x8}", from_raw ? method.MetadataToken : MethodMetadataToken);
+				builder.AppendFormat("0x{0:x8}", from_raw ? GetMetadataToken(method) : MethodMetadataToken);
 				builder.Append("!");
 			}
 			if (from_raw)
@@ -67,8 +74,7 @@ namespace ProductionStackTrace {
 					// using information inside a matching PDB file
 					builder.AppendFormat(CultureInfo.InvariantCulture, " +0x{0:x}", ilOffset);
 				}
-			}
-			else
+			} else
 				builder.Append($" in {(from_raw ? frame.GetFileName() : SourceFileName)}:line {(from_raw ? frame.GetFileLineNumber() : SourceFileLine)}");
 
 
@@ -163,7 +169,7 @@ namespace ProductionStackTrace {
 		public void ToString(StringBuilder builder) {
 
 			builder.AppendFormat("MODULE: {0} => {1};", ShortName, from_raw ? info.Assembly.FullName : AssemblyFullName);
-			if ( (from_raw ? info.DebugInfo != null : DebugInfoPresent)) {
+			if ((from_raw ? info.DebugInfo != null : DebugInfoPresent)) {
 				builder.AppendFormat(" G:{0:N}; A:{1}", from_raw ? info.DebugInfo.Guid : Guid, from_raw ? info.DebugInfo.Age : Age);
 
 				var pdbFileName = from_raw ? info.DebugInfo.Path : PdbFileName;
