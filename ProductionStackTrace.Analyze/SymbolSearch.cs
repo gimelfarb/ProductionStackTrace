@@ -132,7 +132,12 @@ namespace ProductionStackTrace.Analyze {
 			return null;
 		}
 		private (Guid guid, uint age) ExtractInfoFromPDB(String pdb_path) {//no better ways that actually work it seems
-			var src = new Dia2Lib.DiaSource();
+			Dia2Lib.IDiaDataSource src =null;
+			try {
+				src = new Dia2Lib.DiaSource();
+			}catch (FileNotFoundException) {
+				throw SymbolLoader.GetDiagSourceMayBeMissingException();
+			}
 			src.loadDataFromPdb(pdb_path);
 			Dia2Lib.IDiaSession _session;
 			src.openSession(out _session);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -59,7 +60,7 @@ namespace ProductionStackTrace.Analyze {
 		/// </summary>
 		/// <returns></returns>
 		private static IDiaDataSource CoCreateDiaSource() {
-			for (var i = 0; i < s_msdiaGuids.Length; i++) { 
+			for (var i = 0; i < s_msdiaGuids.Length; i++) {
 				try {
 
 
@@ -69,11 +70,36 @@ namespace ProductionStackTrace.Analyze {
 					return (IDiaDataSource)Activator.CreateInstance(Type.GetTypeFromCLSID(s_msdiaGuids[i]));
 				} catch (COMException) {
 
+				} catch (FileNotFoundException) { }
+
+			}
+			throw GetDiagSourceMayBeMissingException();
+		}
+		public static Exception GetDiagSourceMayBeMissingException() {
+			throw new Exception($"Unable to create instance of DiaSource you likely need to run regsvr32 as admin on the path to msdia140.dll like: regsvr32 \"{GetSuggestedDiaLocation()}\"");
+		}
+		public static string GetSuggestedDiaLocation() {
+			var dia_paths = new[] { @"DIA SDK\bin\amd64\", @"Common7\ide\", @"DIA SDK\bin\" };
+			var folder_base = new[] { Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) };
+			var builds = new[] { "Enterpise", "Community", "Preview" };
+			var years = new[] { "2022", "2019", "2016" };
+			string first_path = null;
+			foreach (var folder in folder_base) {
+				foreach (var year in years) {
+					foreach (var build in builds) {
+						foreach (var paths in dia_paths) {
+
+							var path = Path.Combine(folder, "Microsoft Visual Studio", year, build, paths, "msdia140.dll");
+							if (first_path == null)
+								first_path = path;
+							if (File.Exists(path))
+								return path;
+						}
+					}
 				}
 			}
-			throw new Exception(@"Unable to create DiaSource you need to run regsvr32 on the path to msdia140.dll like: regsvr32 ""c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide\msdia140.dll""");
+			return first_path;
 		}
-
 		/// <summary>
 		/// Obtain the original source code file and line number for the given
 		/// IL offset in a method identified by a unique metadata token.
