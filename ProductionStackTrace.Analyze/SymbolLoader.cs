@@ -112,12 +112,13 @@ namespace ProductionStackTrace.Analyze {
 		/// it can always be retrieved from MethodInfo via reflection. Exception
 		/// report saves a meatdata token for each method in the stack trace.
 		/// </remarks>
-		public SourceLocation GetSourceLoc(int methodMetadataToken, int ilOffset) {
+		public SourceLocation GetSourceLoc(int methodMetadataToken, int ilOffset) => GetSourceLoc(methodMetadataToken, ilOffset, true);
+		public SourceLocation GetSourceLoc(int methodMetadataToken, int ilOffset, bool firstTry) {
 			IDiaSymbol symMethod;
 			_session.findSymbolByToken((uint)methodMetadataToken, SymTagEnum.SymTagFunction, out symMethod);
 
 			if (symMethod == null) return null;
-
+			Debug.WriteLine($"{symMethod.compilerName} libName: {symMethod.libraryName}  name: {symMethod.name} count: {symMethod.count} ");
 			var rvaMethod = symMethod.relativeVirtualAddress;
 			rvaMethod += (uint)ilOffset;
 
@@ -126,10 +127,29 @@ namespace ProductionStackTrace.Analyze {
 
 			foreach (IDiaLineNumber ln in lineNumbers) {
 				var sourceFile = ln.sourceFile;
+				//DebugWriteLineNumber($"official isFIrst: {firstTry}", rvaMethod);
+				if (ln.lineNumber == 0xF00F00 || ln.lineNumber == 0xFEEFEE) { //justMycode markers try offset to get proper line
+					return GetSourceLoc(methodMetadataToken, ilOffset + 32, false);
+					//if (methodMetadataToken == 0x06000019) {
+
+					//	//for (uint x = 3500; x < 9000; x+=50) {
+					//	for (uint x = rvaMethod; x < rvaMethod + 200; x += 1) {
+					//		DebugWriteLineNumber("", x);
+					//		//DebugWriteLineNumber("", rvaMethod - x);
+
+					//	}
+
+					}
 				return new SourceLocation() { LineNumber = ln.lineNumber, SourceFile = (sourceFile == null) ? null : sourceFile.fileName };
 			}
 
 			return null;
 		}
+			private void DebugWriteLineNumber(String what, uint rva) {
+				IDiaEnumLineNumbers lineNumbers;
+				_session.findLinesByRVA(rva, 1, out lineNumbers);
+				foreach (IDiaLineNumber ln in lineNumbers)
+					Debug.WriteLine($"{what} at {rva} For: {what} at {ln.lineNumber} -- {ln.sourceFile}");
+			}
 	}
 }
