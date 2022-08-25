@@ -1,10 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dia2Lib;
+using System.Reflection.Metadata;
+using Microsoft.DiaSymReader;
+
+using Microsoft.Diagnostics.Symbols;
+using System.Reflection.PortableExecutable;
+using System.Reflection.Metadata.Ecma335;
+using System.Linq;
 
 namespace ProductionStackTrace.Analyze {
 	/// <summary>
@@ -18,6 +26,7 @@ namespace ProductionStackTrace.Analyze {
 
 		IDiaDataSource _source;
 		IDiaSession _session;
+		MetadataReader _sourceMR;
 
 		private SymbolLoader() {
 		}
@@ -29,13 +38,43 @@ namespace ProductionStackTrace.Analyze {
 		/// <param name="filePath"></param>
 		/// <returns></returns>
 		public static SymbolLoader Load(string filePath) {
+			filePath = filePath.Replace("\\", "/");
 			//try
 			//{
 			var loader = new SymbolLoader();
-			loader._source = CoCreateDiaSource();
+			try {
+				
+				loader._source = CoCreateDiaSource();
+				loader._source.loadDataFromPdb(filePath);
+			} catch (COMException e) {
+				if (IsPortablePDB(filePath)) { //technically these should be readable using the normal debug diag but incase (or on another platform)
+					using var strm = new FileStream(filePath, FileMode.Open);
+					loader._sourceMR = MetadataReaderProvider.FromPortablePdbStream(strm).GetMetadataReader();
+					return loader;
+				}
+				//var metadataProvider = new SymMetadataProvider(peStream);
+				//var path = @"C:\temp\sym\NovaLib.TextUtilsStd.pdb\04A093952079443BBE6EF0C0455B63431";
+				//var reader = new PEReader(new FileStream(Path.Combine(path, "NovaLib.TextUtilsStd.dll"), FileMode.Open));
+				//reader.TryOpenAssociatedPortablePdb(Path.Combine(path, "NovaLib.TextUtilsStd.dll"),PdbStreamRed, out var newReader, out var pdbPath);
+				//var mreader = newReader.GetMetadataReader();
+				//var mrp = MetadataReaderProvider.FromPortablePdbStream(new FileStream(Path.Combine(path, "NovaLib.TextUtilsStd.pdb"), FileMode.Open));
+				//mrp.GetMetadataReader();
 
-			loader._source.loadDataFromPdb(filePath);
+
+					//mreader.
+					//(ISymUnmanagedReader5)new SymBinder().GetReaderFromStream(
+					//	pdbStream,
+					//	SymUnmanagedReaderFactory.CreateSymReaderMetadataImport(metadataProvider));
+					//var metadataProvider = new SymMetadataProvider();
+
+
+				if (e.HResult == unchecked((int)0x806D000C))
+					throw new Exception($"COMException: {e.Message} pdb file: {filePath} is in an invalid format, maybe your msdiag is out of date (or not registered, if only portable pdbs have been attempted), its a corrupt pdb (or portable pdb) or it is not meant for this system, pdb guid: {GetPDBGUID(filePath)}");
+				//0x806D000C
+				throw;
+			}
 			loader._source.openSession(out loader._session);
+
 			return loader;
 			//}
 			//catch
@@ -43,15 +82,41 @@ namespace ProductionStackTrace.Analyze {
 			//    return null;
 			//}
 		}
+		private static bool IsPortablePDB(string filePath) {
+			using var pdbStream = File.OpenRead(filePath);
+			var buff = new byte[4];
+			if (pdbStream.Read(buff, 0, 4) != 4)
+				return false;
+			return Encoding.ASCII.GetString(buff).Equals("BSJB", StringComparison.OrdinalIgnoreCase);
+		}
 
-		private static readonly Guid[] s_msdiaGuids = new[] {
-			//"
-			new Guid("E6756135-1E65-4D17-8576-610761398C3C"), // VS 2017/19 (msdia140.dll)
-            new Guid("3BFCEA48-620F-4B6B-81F7-B9AF75454C7D"), // VS 2013 (msdia120.dll)
-            new Guid("761D3BCD-1304-41D5-94E8-EAC54E4AC172"), // VS 2012 (msdia110.dll)
-            new Guid("B86AE24D-BF2F-4AC9-B5A2-34B14E4CE11D"), // VS 2010 (msdia100.dll)
-            new Guid("4C41678E-887B-4365-A09E-925D28DB33C2")  // VS 2008 (msdia90.dll)
-        };
+
+		private static Stream PdbStreamRed(string arg) {
+			return new FileStream(arg, FileMode.Open);
+		}
+
+		public static Guid GetPDBGUID(String fileName) {
+			using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read)) {
+				using (BinaryReader binReader = new BinaryReader(fs)) {
+					// This is where the GUID for the .pdb file is stored
+					fs.Position = 0x00000a0c;
+
+					//starts at 0xa0c but is pieced together up to 0xa1b
+					byte[] guidBytes = binReader.ReadBytes(16);
+					Guid pdbGuid = new Guid(guidBytes);
+					return pdbGuid;
+				}
+			}
+		}
+		private static readonly Dictionary<Guid, string> s_msdiaGuids = new (){
+
+			{ new Guid("E6756135-1E65-4D17-8576-610761398C3C"), "VS 2017/19/22 (msdia140.dll)" }, // VS 2017/19 (msdia140.dll)
+            {new Guid("3BFCEA48-620F-4B6B-81F7-B9AF75454C7D"), "VS 2013 (msdia120.dll)"}, // VS 2013 (msdia120.dll)
+            {new Guid("761D3BCD-1304-41D5-94E8-EAC54E4AC172"), "VS 2012 (msdia110.dll)"}, // VS 2012 (msdia110.dll)
+            { new Guid("B86AE24D-BF2F-4AC9-B5A2-34B14E4CE11D"), "VS 2010 (msdia100.dll)"}, // VS 2010 (msdia100.dll)
+            { new Guid("4C41678E-887B-4365-A09E-925D28DB33C2"), "VS 2008 (msdia90.dll)"}  // VS 2008 (msdia90.dll)
+
+		};
 
 		/// <summary>
 		/// Helper to instantiate the DIA COM object. This depends on what
@@ -60,14 +125,16 @@ namespace ProductionStackTrace.Analyze {
 		/// </summary>
 		/// <returns></returns>
 		private static IDiaDataSource CoCreateDiaSource() {
-			for (var i = 0; i < s_msdiaGuids.Length; i++) {
+			foreach (var msDiagVer in s_msdiaGuids) { 
 				try {
 
 
 					//if this fails need to call AS ADMIN: regsvr32 "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\ide\msdia140.dll"
 					// or regsvr32 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\Common7\IDE\msdia140.dll"
 					//return new DiaSource();
-					return (IDiaDataSource)Activator.CreateInstance(Type.GetTypeFromCLSID(s_msdiaGuids[i]));
+					var inst = (IDiaDataSource)Activator.CreateInstance(Type.GetTypeFromCLSID(msDiagVer.Key));
+					Console.WriteLine($"Using msdiag: {msDiagVer.Value}");
+					return inst;
 				} catch (COMException) {
 
 				} catch (FileNotFoundException) { }
@@ -115,6 +182,8 @@ namespace ProductionStackTrace.Analyze {
 		public SourceLocation GetSourceLoc(int methodMetadataToken, int ilOffset) => GetSourceLoc(methodMetadataToken, ilOffset, true);
 		public SourceLocation GetSourceLoc(int methodMetadataToken, int ilOffset, bool firstTry) {
 			IDiaSymbol symMethod;
+			if (_sourceMR != null)
+				return GetSourceLocByMetadataReader(methodMetadataToken, ilOffset);
 			_session.findSymbolByToken((uint)methodMetadataToken, SymTagEnum.SymTagFunction, out symMethod);
 
 			if (symMethod == null) return null;
@@ -140,16 +209,28 @@ namespace ProductionStackTrace.Analyze {
 					//	}
 
 					}
-				return new SourceLocation() { LineNumber = ln.lineNumber, SourceFile = (sourceFile == null) ? null : sourceFile.fileName };
+					return new SourceLocation() { LineNumber = ln.lineNumber, SourceFile = (sourceFile == null) ? null : sourceFile.fileName };
+				}
+
+				return null;
 			}
 
-			return null;
+		private SourceLocation GetSourceLocByMetadataReader(int methodMetadataToken, int ilOffset) {
+			//_sourceMR.TryGetMethod
+			//MethodId.FromToken();
+			var handle = MetadataTokens.Handle(methodMetadataToken);
+			var debugInfo = _sourceMR.GetMethodDebugInformation(((MethodDefinitionHandle)handle).ToDebugInformationHandle());
+			var line = debugInfo.GetSequencePoints().Where(a=>a.IsHidden==false && a.Offset <= ilOffset).OrderByDescending(a=>a.Offset).FirstOrDefault();
+			return new SourceLocation {LineNumber=line.StartLine,SourceFile= _sourceMR.GetString( _sourceMR.GetDocument( debugInfo.Document).Name) };
+
+
 		}
-			private void DebugWriteLineNumber(String what, uint rva) {
+
+		private void DebugWriteLineNumber(String what, uint rva) {
 				IDiaEnumLineNumbers lineNumbers;
 				_session.findLinesByRVA(rva, 1, out lineNumbers);
 				foreach (IDiaLineNumber ln in lineNumbers)
 					Debug.WriteLine($"{what} at {rva} For: {what} at {ln.lineNumber} -- {ln.sourceFile}");
 			}
+		}
 	}
-}
