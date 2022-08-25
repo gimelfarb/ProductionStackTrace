@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,7 +45,7 @@ namespace ProductionStackTrace.Test
                 new [] {new LineNumberInfo("SomeClass.cs", 13)});
             InternalTestException(IsolatedMode.NoSymbols, "SomeClass.B()",
                 string.Format("System.InvalidOperationException: {0} ---> System.Exception: SomeClass.InternalCompare", GetEnvironmentResourceString("InvalidOperation_IComparerFailed")), 
-                new [] {new LineNumberInfo("SomeClass.cs", 27), new LineNumberInfo("SomeClass.cs", 22)});
+                new [] {new LineNumberInfo("SomeClass.cs", 28), new LineNumberInfo("SomeClass.cs", 22)});
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace ProductionStackTrace.Test
                 new[] { new LineNumberInfo("SomeClass.cs", 13) });
             InternalTestException(IsolatedMode.WithSymbols, "SomeClass.B()",
                 string.Format("System.InvalidOperationException: {0} ---> System.Exception: SomeClass.InternalCompare", GetEnvironmentResourceString("InvalidOperation_IComparerFailed")),
-                new[] { new LineNumberInfo("SomeClass.cs", 27), new LineNumberInfo("SomeClass.cs", 22) });
+                new[] { new LineNumberInfo("SomeClass.cs", 28), new LineNumberInfo("SomeClass.cs", 22) });
         }
         [TestMethod]
         public void TestObjectExportChanges() {
