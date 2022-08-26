@@ -21,12 +21,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{03B97452-6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductionStackTraceStd", "ProductionStackTraceStd\ProductionStackTraceStd.csproj", "{364E2C08-1567-4A40-B4EA-69DD0F9E5061}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{3CF6917C-08A7-48AB-B3EC-829EE757F1AC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3CF6917C-08A7-48AB-B3EC-829EE757F1AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CF6917C-08A7-48AB-B3EC-829EE757F1AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F8A759B-6096-468E-A370-09C9785D673C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F8A759B-6096-468E-A370-09C9785D673C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F8A759B-6096-468E-A370-09C9785D673C}.Release|Any CPU.ActiveCfg = Release|Any CPU

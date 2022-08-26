@@ -11,7 +11,7 @@
 [Dd]ebug/
 [Rr]elease/
 x64/
-build/
+
 [Bb]in/
 [Oo]bj/
 _deploy/
@@ -155,3 +155,4 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+final
