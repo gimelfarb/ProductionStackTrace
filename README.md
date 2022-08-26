@@ -1,5 +1,10 @@
 # ProductionStackTrace
 
+## Fork notes
+This is the unofficial fork/continuation of: https://github.com/gimelfarb/ProductionStackTrace it no longer shows as a fork as github treats true forks as third class citizens and the original project does seem dead.  I am not publishing any nuget packages currently, but you can download from the latest compiled builds at: https://github.com/mitchcapper/ProductionStackTrace/actions/workflows/continuous.yml
+
+
+# Summary
 [Don't want to deploy PDBs][2], but still get exception stack traces that map to original source line numbers? Want to [have your cake and eat it too](http://en.wikipedia.org/wiki/You_can't_have_your_cake_and_eat_it)?
 
 [ProductionStackTrace][1] is intended to **run in Production**, **without any access to PDB symbol files**. It produces a stack trace with enough information to be analyzed by the techies back on the base with a **help of a [Symbol Store][3]** to get original source code line numbers.
